@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="text/javascript" src="./lib/web3.min.js"></script>
+<script src="http://code.jquery.com/jquery-latest.js "></script>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+ <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
+
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+
+<body class="container">
+    <div class="row">
+      <h1>Calligraphy License Token Sale</h1>
+      <div>
+        <span>전체 발행량 : </span>
+        <span id="totalSupply"></span>
+
+      </div>
+      <div>
+        <div>
+          <input type="password" id="i_password" placeholder=" 비밀번호를 입력하세요"/>
+          <button type="button" name="button" id="btnNewAccount" class="btn btn-primary">계정 생성</button>
+        </div>
+      </div>
+      <div class="table-responsive" style="margin-top: 10px">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>address</th>
+              <th>balance</th>
+              <th>buy</th>
+            </tr>
+          </thead>
+          <tbody id="dataBody">
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+</body>
+
+<script type="text/javascript">
+  // ico html 디자인에 google font와 w3 css를 사용했습니다.
+  var Web3 = require('web3');
+  var web3 = new Web3();
+  web3.setProvider(new web3.providers.HttpProvider("http://192.168.0.106:8545"));
+  var contractAddress = '0x153f6cca9e8f77d07ddb9a0432160475e76a0c1f';
+  var contract = web3.eth.contract([
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"name": "_owner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"name": "_spender",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "_value",
+				"type": "uint256"
+			}
+		],
+		"name": "Approval",
+		"type": "event"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_spender",
+				"type": "address"
+			},
+			{
+				"name": "_value",
+				"type": "uint256"
+			}
+		],
+		"name": "approve",
+		"outputs": [
+			{
+				"name": "success",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_spender",
+				"type": "address"
+			},
+			{
+				"name": "_value",
+				"type": "uint256"
+			},
+			{
+				"name": "_extraData",
+				"type": "bytes"
+			}
+		],
+		"name": "approveAndCall",
+		"outputs": [
+			{
+				"name": "success",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_to",
+				"type": "address"
+			},
+			{
+				"name": "_value",
+				"type": "uint256"
+			}
+		],
+		"name": "transfer",
+		"outputs": [
+			{
+				"name": "success",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_from",
+				"type": "address"
+			},
+			{
+				"name": "_to",
+				"type": "address"
+			},
+			{
+				"name": "_value",
+				"type": "uint256"
+			}
+		],
+		"name": "transferFrom",
+		"outputs": [
+			{
+				"name": "success",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"name": "_from",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"name": "_to",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "_value",
+				"type": "uint256"
+			}
+		],
+		"name": "Transfer",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "fallback"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "_owner",
+				"type": "address"
+			},
+			{
+				"name": "_spender",
+				"type": "address"
+			}
+		],
+		"name": "allowance",
+		"outputs": [
+			{
+				"name": "remaining",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "_owner",
+				"type": "address"
+			}
+		],
+		"name": "balanceOf",
+		"outputs": [
+			{
+				"name": "balance",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "decimals",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint8"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "name",
+		"outputs": [
+			{
+				"name": "",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "symbol",
+		"outputs": [
+			{
+				"name": "",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "totalSupply",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "version",
+		"outputs": [
+			{
+				"name": "",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	}
+]).at(contractAddress);
+
+let adminAccount;
+
+$(document).ready(function(){
+  // web3.personal.unlockAccount(contractAddress, 0)
+  let redirect = () => {
+    let accounts = web3.eth.accounts
+    $('#dataBody').html('')
+    accounts.map(item => {
+      $('#dataBody').append('<tr><td class="userId">'+item+'</td><td>' + contract.balanceOf(item)
+     + '</td><td><button type="button" name="button" class="btnBuyToken btn btn-primary">buy token</button></td></tr>')
+    })
+
+    $('.userId').each(function(i){
+      if(i == 0){
+        adminAccount = $(this).html()
+        // console.log(adminAccount)
+        // $(this).parents('tr').css('display', 'none')
+
+      }
+    })
+  }
+
+  redirect()
+
+  //전체 발행량을 보여준다.
+  $('#totalSupply').html(contract.totalSupply().c + " CAL")
+
+  //계정을 생성한다.
+  $('#btnNewAccount').on('click', function(){
+    var pw = $('#i_password').val()
+    var newAccount = web3.personal.newAccount(pw)
+    // web3.personal.unlockAccount(newAccount, pw, 0)
+    redirect()
+
+  })
+
+  //계정과 원하는 토큰의 양을 입력한다. 컨트랙트 호출하여 실제 전송해준다.
+  $('.btnBuyToken').on('click', function(){
+
+    //실제 서비스시에는 eth를 전송 받아서 비율만큼 token을 전송해준다.
+
+    var userId = $(this).parents('td').siblings('.userId').html()
+    web3.eth.defaultAccount = adminAccount
+
+    // admin unlock
+    web3.personal.unlockAccount(adminAccount, "1234", 100)
+    console.log(contract.transfer(userId, 100))
+
+    redirect()
+  })
+
+})
+
+</script>
+
+</html>

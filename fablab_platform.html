@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="text/javascript" src="./lib/web3.min.js"></script>
+<script src="http://code.jquery.com/jquery-latest.js "></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+<body class="container">
+    <div class="row">
+      <h1>Calligraphy License Platform</h1>
+    </div>
+
+    <div class="row col-md-12">
+      <div class="col-md-4">
+        <form class="" action="/up" method="post" enctype="multipart/form-data">
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon1">Title</span>
+            </div>
+            <input type="text" class="form-control" id="i_title" placeholder="Title" aria-label="Title" aria-describedby="basic-addon1" required>
+          </div>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon2">Name</span>
+            </div>
+            <input type="text" class="form-control" id="i_ownerName" placeholder="Username" aria-label="Username" aria-describedby="basic-addon2" required>
+          </div>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon3">calligraphy</span>
+            </div>
+            <input type="file" name="file" class="form-control" id="i_fileName" placeholder="file upload" aria-label="file upload" aria-describedby="basic-addon3" required>
+          </div>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon4">price</span>
+            </div>
+            <input type="number" class="form-control" id="i_price" placeholder="price" aria-label="price" aria-describedby="basic-addon4" required>
+          </div>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon5">account</span>
+            </div>
+            <input type="text" class="form-control" id="i_owner" placeholder="account" aria-label="account" aria-describedby="basic-addon5" required>
+          </div>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon6">password</span>
+            </div>
+            <input type="password" class="form-control" placeholder="password" aria-label="password" aria-describedby="basic-addon6" required>
+          </div>
+          <div>
+            <button class="btn btn-primary" id="btn_add">등록</button>
+          </div>
+        </form>
+      </div>
+      <div class="col-md-8">
+        <div class="table-responsive">
+          <table class="table table-bordered text-center">
+            <thead>
+              <tr>
+                <th>TITLE</th>
+                <th>NAME</th>
+                <th>PRICE</th>
+                <th>DOWNLOAD</th>
+              </tr>
+            </thead>
+            <tbody id="dataBody">
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+</body>
+
+<script>
+var Web3 = require('web3');
+var web3 = new Web3();
+web3.setProvider(new web3.providers.HttpProvider("http://192.168.0.106:8545"));
+var contractAddress = '0x9e56ab2b65045591a0d20b16583db6fa4423528f';
+var contract = web3.eth.contract([
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_title",
+				"type": "string"
+			},
+			{
+				"name": "_ownerName",
+				"type": "string"
+			},
+			{
+				"name": "_fileName",
+				"type": "string"
+			},
+			{
+				"name": "_owner",
+				"type": "address"
+			},
+			{
+				"name": "_price",
+				"type": "uint16"
+			}
+		],
+		"name": "addCalli",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_title",
+				"type": "string"
+			},
+			{
+				"name": "_buyer",
+				"type": "address"
+			}
+		],
+		"name": "downloadCalli",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "callis",
+		"outputs": [
+			{
+				"name": "title",
+				"type": "string"
+			},
+			{
+				"name": "ownerName",
+				"type": "string"
+			},
+			{
+				"name": "fileName",
+				"type": "string"
+			},
+			{
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"name": "price",
+				"type": "uint16"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "_idx",
+				"type": "uint256"
+			}
+		],
+		"name": "getCalliAddress",
+		"outputs": [
+			{
+				"name": "",
+				"type": "string"
+			},
+			{
+				"name": "",
+				"type": "string"
+			},
+			{
+				"name": "",
+				"type": "string"
+			},
+			{
+				"name": "",
+				"type": "address"
+			},
+			{
+				"name": "",
+				"type": "uint16"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "getCalliNum",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	}
+]).at(contractAddress);
+
+console.log(contract)
+
+web3.eth.defaultAccount = web3.eth.accounts[0]
+
+// 버튼 클릭 시 기능 구현
+$('#btn_add').click(function(){
+  // 파일업로드 -> form 에서 multer로 처리
+
+  // addCalli호출
+  var fullPath = $('#i_fileName').val();
+  var fileName = fullPath.split(/(\\|\/)/g).pop()
+  contract.addCalli($('#i_title').val(), $('#i_ownerName').val(), fileName, $('#i_owner').val(), $('#i_price').val(), {from: web3.eth.accounts[0], gas: 200000})
+
+  // 수수료 to 플랫폼
+
+})
+
+getList()
+
+// 리스트 불러오기
+function getList(){
+  // getCalliNum
+  var num = contract.getCalliNum().toNumber()
+
+  var str = ''
+  // getCalliAddress
+  for(var i=0; i<num; i++){
+    var obj = contract.getCalliAddress(i)
+    str += '<tr>'+
+      '<td>'+obj[0]+'</td>' +
+      '<td>'+obj[1]+'</td>' +
+      '<td>'+obj[4].toNumber()+'</td>' +
+      '<td><a onclick="downloadCalli('+obj[2]+')" >'+obj[2]+'</a></td>' +
+    '</tr>'
+  }
+  $('#dataBody').html(str)
+}
+
+// download 기능 구현
+// 수수료 from 사용자 to 등록자
+
+</script>
+
+</html>
